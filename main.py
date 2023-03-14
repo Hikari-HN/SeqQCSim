@@ -7,17 +7,19 @@
 @Date    ：2023/2/28 20:01 
 """
 from gate import *
+from test import *
 from operation import *
 
 # NodeCollection allows us to store all the nodes created under this context.
-for i in range(100):
+for i in range(1):
     all_nodes = []
     with tn.NodeCollection(all_nodes):
         state_nodes = [
             tn.Node(np.array([1.0 + 0.0j, 0.0 + 0.0j])),
-            tn.Node(gen_random_qubit()) if i == 0 else tn.Node(get_new_qubit(result, 1))
+            # tn.Node(np.array([1.0 + 0.0j, 0.0 + 0.0j]))
+            tn.Node(np.array([np.sqrt(2) / 2 + 0.0j, np.sqrt(2) / 2 + 0.0j])) if i == 0 else tn.Node(get_new_qubit(result, 1))
         ]
-        print(state_nodes[1].tensor)
+        # print(state_nodes[1].tensor)
         qubits = [node[0] for node in state_nodes]
         apply_gate(qubits, H, [0])
         apply_gate(qubits, T, [0])
@@ -32,4 +34,9 @@ for i in range(100):
         apply_gate(qubits, T, [0])
         apply_gate(qubits, H, [0])
     result = tn.contractors.optimal(all_nodes, output_edge_order=qubits)
-    result = do_random_measure(result, [0])
+    print(result.tensor)
+    print(p_dict_by_measure(result, [0]))
+    # result = measure_by_output(result, [0], [0])
+
+    # print(result.tensor)
+    # result = do_random_measure(result, [0])

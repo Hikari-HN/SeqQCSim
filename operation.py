@@ -77,3 +77,97 @@ def get_new_qubit(state, target_qubit):
                 new_qubit[i] += state.tensor[j]
     state.tensor = state.tensor.reshape([2] * n)
     return new_qubit
+
+
+def init_unitary_matrix(num_qubits):
+    return np.eye(1 << num_qubits, dtype=complex).reshape([2] * 2 * num_qubits)
+
+
+def get_unitary_matrix(num_qubits, gate_info_list):
+    all_gate_nodes = []
+    with tn.NodeCollection(all_gate_nodes):
+        unitary_matrix = tn.Node(init_unitary_matrix(num_qubits))
+        input_edges, output_edges = [unitary_matrix.get_all_edges()[i: i + num_qubits] for i in
+                                     range(0, 2 * num_qubits, num_qubits)]
+        for gate_info in gate_info_list:
+            apply_gate(output_edges, gate_info[0], gate_info[1])
+    return tn.contractors.optimal(all_gate_nodes, output_edge_order=input_edges + output_edges).tensor
+
+
+def get_density_matrix(state):
+    return np.outer(state.tensor, tn.conj(state.tensor)).reshape([2] * 2 * len(state.get_all_edges()))
+
+
+def get_measurement_operator(num_qubits, output):
+    if type(output) == list:
+        if len(output) != num_qubits:
+            raise ValueError("output length must be equal to num_qubits")
+        output = sum([1 << (num_qubits - 1 - i) for i in range(len(output)) if output[i]])
+    if output >= 1 << num_qubits:
+        raise ValueError("output must be less than 2 ** num_qubits")
+    basis = np.zeros(1 << num_qubits, dtype=complex)
+    basis[output] = 1
+    return np.outer(basis, np.conj(basis)).reshape([2] * 2 * num_qubits)
+
+
+def get_measurement_matrix_by_output(num_qubits, target_qubits, output):
+    all_gate_nodes = []
+    with tn.NodeCollection(all_gate_nodes):
+        measurement_matrix = tn.Node(init_unitary_matrix(num_qubits))
+        input_edges, output_edges = [measurement_matrix.get_all_edges()[i: i + num_qubits] for i in
+                                     range(0, 2 * num_qubits, num_qubits)]
+        apply_gate(output_edges, get_measurement_operator(len(target_qubits), output), target_qubits)
+    return tn.contractors.optimal(all_gate_nodes, output_edge_order=input_edges + output_edges).tensor
+
+
+def get_super_operator_and_prob(output, input_density, stored_density, unitary):
+    num_stored_qubits = len(stored_density.get_all_edges()) // 2
+    num_input_qubits = len(input_density.get_all_edges()) // 2
+    num_qubits = num_input_qubits + num_stored_qubits
+    total_density_node = tn.Node(np.outer(input_density.tensor, stored_density.tensor).reshape([2] * 2 * num_qubits))
+    unitary_node = tn.Node(unitary)
+    measurement = get_measurement_matrix_by_output(num_qubits, list(range(num_input_qubits)), output)
+    measurement_node = tn.Node(measurement)
+    unitary_dagger_node = tn.Node(np.conj(matrix_transpose(unitary)))
+    measurement_dagger_node = tn.Node(np.conj(matrix_transpose(measurement)))
+    [measurement_node[i + num_qubits] ^ unitary_node[i] for i in range(num_qubits)]
+    unitary_node = measurement_node @ unitary_node
+    [unitary_dagger_node[i + num_qubits] ^ measurement_dagger_node[i] for i in range(num_qubits)]
+    unitary_dagger_node = unitary_dagger_node @ measurement_dagger_node
+    [unitary_node[i + num_qubits] ^ total_density_node[i] for i in range(num_qubits)]
+    total_density_node = unitary_node @ total_density_node
+    [total_density_node[i + num_qubits] ^ unitary_dagger_node[i] for i in range(num_qubits)]
+    new_density_node = total_density_node @ unitary_dagger_node
+    tmp = new_density_node.copy()
+    [new_density_node[i] ^ new_density_node[i + num_qubits] for i in range(num_input_qubits)]
+    new_density_node = new_density_node @ new_density_node
+    [tmp[i] ^ tmp[i + num_qubits] for i in range(num_qubits)]
+    prob = tmp @ tmp
+    return new_density_node, prob
+
+
+def get_total_super_operator(output_list, input_state_list, stored_state, unitary):
+    stored_density = tn.Node(get_density_matrix(stored_state))
+    super_operator = tn.Node(init_unitary_matrix(len(stored_density.get_all_edges()) // 2))
+    for output, input_state in zip(output_list, input_state_list):
+        input_density = tn.Node(get_density_matrix(input_state))
+        super_operator, prob = get_super_operator_and_prob(output, input_density, stored_density, unitary)
+        print(prob.tensor)
+        stored_density = super_operator / prob
+    return super_operator
+
+
+def check_trace_all_zero(super_op_basis):
+    for super_op in super_op_basis:
+        num_qubits = len(super_op.get_all_edges()) // 2
+        var = [super_op[i] ^ super_op[i + num_qubits] for i in range(num_qubits)]
+        trace = super_op @ super_op
+        if trace.tensor != 0:
+            return False
+    return True
+
+
+def matrix_transpose(tensor):
+    shape = tensor.shape
+    n = 1 << (len(shape) // 2)
+    return np.transpose(tensor.reshape(n, n)).reshape(shape)

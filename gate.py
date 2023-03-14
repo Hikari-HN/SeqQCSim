@@ -12,7 +12,8 @@ import numpy as np
 H = np.array([[1, 1], [1, -1]], dtype=complex) / np.sqrt(2)
 T = np.array([[1, 0], [0, np.exp(np.pi * 1.0j / 4)]], dtype=complex)
 Z = np.array([[1, 0], [0, -1]], dtype=complex)
-TD = np.conjugate(T)
+I = np.array([[1, 0], [0, 1]], dtype=complex)
+TD = np.conjugate(T).T
 CNOT = np.zeros((2, 2, 2, 2), dtype=complex)
 CNOT[0][0][0][0] = 1
 CNOT[0][1][0][1] = 1
