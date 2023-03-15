@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 """
 @Project ：SeqQCSim 
-@File    ：case_A_RUS.py
+@File    ：qrus-1.py
 @Author  ：ZiHao Li
 @Date    ：2023/3/12 13:01 
 """

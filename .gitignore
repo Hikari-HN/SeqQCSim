@@ -6,7 +6,6 @@ __pycache__/
 
 # My Test Files
 test.py
-VC_Sympy.py
 
 # C extensions
 *.so
