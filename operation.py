@@ -124,35 +124,68 @@ def get_super_operator_and_prob(output, input_density, stored_density, unitary):
     num_stored_qubits = len(stored_density.get_all_edges()) // 2
     num_input_qubits = len(input_density.get_all_edges()) // 2
     num_qubits = num_input_qubits + num_stored_qubits
-    total_density_node = tn.Node(np.outer(input_density.tensor, stored_density.tensor).reshape([2] * 2 * num_qubits))
+
+    # print("input_density\n", input_density.tensor.reshape(1 << num_input_qubits, 1 << num_input_qubits))
+    # print("stored_density\n", stored_density.tensor.reshape(1 << num_stored_qubits, 1 << num_stored_qubits))
+
+    total_density_node = tn.Node(np.kron(input_density.tensor, stored_density.tensor).reshape([2] * 2 * num_qubits))
+
+    # print("total_density_node\n", total_density_node.tensor.reshape(1 << num_qubits, 1 << num_qubits))
+
     unitary_node = tn.Node(unitary)
     measurement = get_measurement_matrix_by_output(num_qubits, list(range(num_input_qubits)), output)
     measurement_node = tn.Node(measurement)
     unitary_dagger_node = tn.Node(np.conj(matrix_transpose(unitary)))
     measurement_dagger_node = tn.Node(np.conj(matrix_transpose(measurement)))
+
+    # print("measurement_node\n", measurement_node.tensor.reshape(1 << num_qubits, 1 << num_qubits))
+    # print("unitary_node\n", unitary_node.tensor.reshape(1 << num_qubits, 1 << num_qubits))
+
     [measurement_node[i + num_qubits] ^ unitary_node[i] for i in range(num_qubits)]
     unitary_node = measurement_node @ unitary_node
+
+    # print("measurement * unitary\n", unitary_node.tensor.reshape(1 << num_qubits, 1 << num_qubits))
+    # print("unitary_dagger_node\n", unitary_dagger_node.tensor.reshape(1 << num_qubits, 1 << num_qubits))
+    # print("measurement_dagger_node\n", measurement_dagger_node.tensor.reshape(1 << num_qubits, 1 << num_qubits))
+
     [unitary_dagger_node[i + num_qubits] ^ measurement_dagger_node[i] for i in range(num_qubits)]
     unitary_dagger_node = unitary_dagger_node @ measurement_dagger_node
+
+    # print("unitary_dagger * measurement_dagger\n", unitary_dagger_node.tensor.reshape(1 << num_qubits, 1 << num_qubits))
+    # print("total_density_node\n", total_density_node.tensor.reshape(1 << num_qubits, 1 << num_qubits))
+
     [unitary_node[i + num_qubits] ^ total_density_node[i] for i in range(num_qubits)]
     total_density_node = unitary_node @ total_density_node
+
+    # print("left * total_density\n", total_density_node.tensor.reshape(1 << num_qubits, 1 << num_qubits))
+
     [total_density_node[i + num_qubits] ^ unitary_dagger_node[i] for i in range(num_qubits)]
     new_density_node = total_density_node @ unitary_dagger_node
+
+    # print("left * total_density * right\n", new_density_node.tensor.reshape(1 << num_qubits, 1 << num_qubits))
+
     tmp = new_density_node.copy()
     [new_density_node[i] ^ new_density_node[i + num_qubits] for i in range(num_input_qubits)]
     new_density_node = new_density_node @ new_density_node
+
+    # print("partial_trace\n", new_density_node.tensor.reshape(1 << num_stored_qubits, 1 << num_stored_qubits))
+
     [tmp[i] ^ tmp[i + num_qubits] for i in range(num_qubits)]
     prob = tmp @ tmp
+
+    # print("prob\n", prob.tensor)
+
     return new_density_node, prob
 
 
-def get_total_super_operator(output_list, input_state_list, stored_state, unitary):
-    stored_density = tn.Node(get_density_matrix(stored_state))
-    super_operator = tn.Node(init_unitary_matrix(len(stored_density.get_all_edges()) // 2))
+def get_total_super_operator(output_list, input_state_list, stored_density, unitary):
+    super_operator = stored_density
+    prob = tn.Node(1)
     for output, input_state in zip(output_list, input_state_list):
         input_density = tn.Node(get_density_matrix(input_state))
         super_operator, prob = get_super_operator_and_prob(output, input_density, stored_density, unitary)
-        print(prob.tensor)
+        if np.abs(prob.tensor) <= 1e-13:  # 设置误差
+            return None
         stored_density = super_operator / prob
     return super_operator
 
@@ -162,7 +195,7 @@ def check_trace_all_zero(super_op_basis):
         num_qubits = len(super_op.get_all_edges()) // 2
         var = [super_op[i] ^ super_op[i + num_qubits] for i in range(num_qubits)]
         trace = super_op @ super_op
-        if trace.tensor != 0:
+        if np.abs(trace.tensor) > 1e-13:  # 设置误差
             return False
     return True
 
