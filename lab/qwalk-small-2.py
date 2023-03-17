@@ -22,13 +22,17 @@ O = list(range(1 << len(B[0].get_all_edges())))  # the collection of all possibl
 gate_info_list = [[H, [1]], [TWALK, [1, 2, 3]], [Toffoli, [2, 3, 0]]]
 unitary = get_unitary_matrix(4, gate_info_list)
 
-tmp_1 = np.zeros(8, dtype=complex)
+tmp_1 = np.zeros(4, dtype=complex)
 tmp_1[0] = 1
-rho_1 = tn.Node(tmp_1.reshape([2, 2, 2]))
-tmp_2 = np.zeros(8, dtype=complex)
+p_1 = tn.Node(tmp_1.reshape([2, 2]))
+tmp_2 = np.zeros(4, dtype=complex)
 tmp_2[2] = 1
-rho_2 = tn.Node(tmp_2.reshape([2, 2, 2]))
-stored_density_1 = tn.Node(get_density_matrix(rho_1))
-stored_density_2 = tn.Node(get_density_matrix(rho_2))
+p_2 = tn.Node(tmp_2.reshape([2, 2]))
+p_1_Dmatrix = get_density_matrix(p_1).reshape(4, 4)
+p_2_Dmatrix = get_density_matrix(p_2).reshape(4, 4)
+theta = tn.Node(np.array([1, 1j], dtype=complex) / np.sqrt(2))
+theta_Dmatrix = get_density_matrix(theta).reshape(2, 2)
+stored_density_1 = tn.Node(np.kron(theta_Dmatrix, p_1_Dmatrix).reshape([2] * 6))
+stored_density_2 = tn.Node(np.kron(theta_Dmatrix, p_2_Dmatrix).reshape([2] * 6))
 
-eq_check(B, O, unitary, stored_density_1, stored_density_2)
+eq_check(B, O, unitary, unitary, stored_density_1, stored_density_2)

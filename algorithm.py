@@ -14,14 +14,14 @@ from myqueue import *
 from common import is_span
 
 
-def eq_check(B, O, unitary, stored_density_1, stored_density_2):
+def eq_check(B, O, unitary_1, unitary_2, stored_density_1, stored_density_2):
     super_op_basis = []
     Q = MyQueue()
     Q.push(([], []))
     while not Q.is_empty():
         input_state_list, output_list = Q.pop().item
-        super_operator_1 = get_total_super_operator(output_list, input_state_list, stored_density_1, unitary)
-        super_operator_2 = get_total_super_operator(output_list, input_state_list, stored_density_2, unitary)
+        super_operator_1 = get_total_super_operator(output_list, input_state_list, stored_density_1, unitary_1)
+        super_operator_2 = get_total_super_operator(output_list, input_state_list, stored_density_2, unitary_2)
         if super_operator_1:
             if super_operator_2:
                 super_operator = super_operator_1 - super_operator_2

@@ -2,9 +2,9 @@
 # -*- coding: UTF-8 -*-
 """
 @Project ：SeqQCSim 
-@File    ：qwalk-small-1.py
+@File    ：qwalk-sym-1.py
 @Author  ：ZiHao Li
-@Date    ：2023/3/16 0:22 
+@Date    ：2023/3/17 14:41 
 """
 
 import tensornetwork as tn
@@ -26,7 +26,7 @@ tmp_1 = np.zeros(8, dtype=complex)
 tmp_1[0] = 1
 rho_1 = tn.Node(tmp_1.reshape([2, 2, 2]))
 tmp_2 = np.zeros(8, dtype=complex)
-tmp_2[2] = 1
+tmp_2[6] = 1
 rho_2 = tn.Node(tmp_2.reshape([2, 2, 2]))
 stored_density_1 = tn.Node(get_density_matrix(rho_1))
 stored_density_2 = tn.Node(get_density_matrix(rho_2))
