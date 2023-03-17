@@ -89,6 +89,7 @@ def get_unitary_matrix(num_qubits, gate_info_list):
         unitary_matrix = tn.Node(init_unitary_matrix(num_qubits))
         input_edges, output_edges = [unitary_matrix.get_all_edges()[i: i + num_qubits] for i in
                                      range(0, 2 * num_qubits, num_qubits)]
+        gate_info_list = gate_info_list[::-1]
         for gate_info in gate_info_list:
             apply_gate(output_edges, gate_info[0], gate_info[1])
     return tn.contractors.optimal(all_gate_nodes, output_edge_order=input_edges + output_edges).tensor
@@ -128,7 +129,10 @@ def get_super_operator_and_prob(output, input_density, stored_density, unitary):
     # print("input_density\n", input_density.tensor.reshape(1 << num_input_qubits, 1 << num_input_qubits))
     # print("stored_density\n", stored_density.tensor.reshape(1 << num_stored_qubits, 1 << num_stored_qubits))
 
-    total_density_node = tn.Node(np.kron(input_density.tensor, stored_density.tensor).reshape([2] * 2 * num_qubits))
+    total_density_node = tn.Node(np.kron(input_density.tensor.reshape(1 << num_input_qubits, 1 << num_input_qubits),
+                                         stored_density.tensor.reshape(1 << num_stored_qubits,
+                                                                       1 << num_stored_qubits)).reshape(
+        [2] * 2 * num_qubits))
 
     # print("total_density_node\n", total_density_node.tensor.reshape(1 << num_qubits, 1 << num_qubits))
 
@@ -184,7 +188,7 @@ def get_total_super_operator(output_list, input_state_list, stored_density, unit
     for output, input_state in zip(output_list, input_state_list):
         input_density = tn.Node(get_density_matrix(input_state))
         super_operator, prob = get_super_operator_and_prob(output, input_density, stored_density, unitary)
-        if np.abs(prob.tensor) <= 1e-13:  # 设置误差
+        if np.abs(prob.tensor) <= 1e-13:  # set error threshold
             return None
         stored_density = super_operator / prob
     return super_operator
@@ -195,7 +199,7 @@ def check_trace_all_zero(super_op_basis):
         num_qubits = len(super_op.get_all_edges()) // 2
         var = [super_op[i] ^ super_op[i + num_qubits] for i in range(num_qubits)]
         trace = super_op @ super_op
-        if np.abs(trace.tensor) > 1e-13:  # 设置误差
+        if np.abs(trace.tensor) > 1e-13:  # set error threshold
             return False
     return True
 
