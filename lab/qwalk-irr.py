@@ -16,7 +16,7 @@ from algorithm import eq_check
 B = [tn.Node(np.array([1, 0], dtype=complex)),  # |0>
      tn.Node(np.array([0, 1], dtype=complex)),  # |1>
      tn.Node(np.array([1, 1], dtype=complex) / np.sqrt(2)),  # |+>
-     tn.Node(np.array([1, 1j], dtype=complex) / np.sqrt(2)),  # |theta>
+     tn.Node(np.array([1, 1j], dtype=complex) / np.sqrt(2))  # |theta>
      ]  # the collection of all possible input states
 O = list(range(1 << len(B[0].get_all_edges())))  # the collection of all possible outputs
 gate_info_list_1 = [[RX(np.sqrt(2)), [1]], [TWALK, [1, 2, 3]], [Toffoli, [2, 3, 0]]]

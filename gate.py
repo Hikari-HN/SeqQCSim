@@ -16,6 +16,8 @@ Y = np.array([[0, -1j], [1j, 0]], dtype=complex)
 Z = np.array([[1, 0], [0, -1]], dtype=complex)
 I = np.array([[1, 0], [0, 1]], dtype=complex)
 TD = np.conjugate(T).T
+V = np.array([[1 + 1j, 1 - 1j], [1 - 1j, 1 + 1j]], dtype=complex) / 2
+VD = np.conjugate(V).T
 CNOT = np.zeros((2, 2, 2, 2), dtype=complex)
 CNOT[0][0][0][0] = 1
 CNOT[0][1][0][1] = 1
@@ -45,8 +47,42 @@ Toffoli[1][0][1][1][0][1] = 1
 Toffoli[1][1][0][1][1][1] = 1
 Toffoli[1][1][1][1][1][0] = 1
 YWALK = np.array([[1, 1j], [1j, 1]], dtype=complex) / np.sqrt(2)
+CT = np.eye(4, dtype=complex)
+CT[3][3] = np.exp(np.pi * 1.0j / 4)
+CT = CT.reshape((2, 2, 2, 2))
 
 
 def RX(theta):
+    """Returns the rotation around the X axis by theta."""
     return np.array([[np.cos(theta / 2), -1j * np.sin(theta / 2)],
                      [-1j * np.sin(theta / 2), np.cos(theta / 2)]], dtype=complex)
+
+
+def QFT(n):
+    """Returns the QFT operator for n qubits."""
+    N = 1 << n
+    mat = np.zeros((N, N), dtype=complex)
+    for k in range(N):
+        for j in range(N):
+            mat[k][j] = np.exp(2 * np.pi * 1j * j * k / N) / np.sqrt(N)
+    return mat.reshape([2] * (2 * n))
+
+
+def Cgate(flag_list, gate):
+    """
+    :param flag_list: a list of flags for control qubits
+    :param gate: a gate
+    :return: a controlled gate
+    """
+    num_control_qubits = len(flag_list)
+    num_target_qubits = len(gate.shape) // 2
+    num_qubits = num_control_qubits + num_target_qubits
+    N = 1 << num_qubits
+    mat = np.eye(N, dtype=complex)
+    flag_num = sum([1 << (num_control_qubits - 1 - i) for i in range(num_control_qubits) if flag_list[i]])
+    gate = gate.reshape(1 << num_target_qubits, 1 << num_target_qubits)
+    for j in range(N):
+        if (j >> num_target_qubits) == flag_num:
+            for k in range(N - (1 << num_target_qubits), N):
+                mat[j][k] = gate[j % (1 << num_target_qubits)][k % (1 << num_target_qubits)]
+    return mat.reshape([2] * (2 * num_qubits))
