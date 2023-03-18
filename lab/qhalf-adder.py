@@ -13,10 +13,10 @@ from operation import *
 from gate import *
 from algorithm import eq_check
 
-B = [tn.Node(np.array([[1, 0], [0, 0]], dtype=complex)),  # |00>
-     tn.Node(np.array([[0, 1], [0, 0]], dtype=complex)),  # |01>
-     tn.Node(np.array([[0, 0], [1, 0]], dtype=complex)),  # |10>
-     tn.Node(np.array([[0, 0], [0, 1]], dtype=complex))  # |11>
+B = [get_computational_basis_by_index(2, 0),  # |00>
+     get_computational_basis_by_index(2, 1),  # |01>
+     get_computational_basis_by_index(2, 2),  # |10>
+     get_computational_basis_by_index(2, 3)  # |11>
      ]  # the collection of all possible input states
 O = list(range(1 << len(B[0].get_all_edges())))  # the collection of all possible outputs
 gate_info_list_1 = [[Cgate([1], VD), [2, 0]], [CNOT, [1, 2]], [Cgate([1], V), [2, 0]], [Cgate([1], V), [1, 0]],
@@ -25,8 +25,8 @@ unitary_1 = get_unitary_matrix(3, gate_info_list_1)
 gate_info_list_2 = [[Toffoli, [1, 2, 0]], [CNOT, [1, 2]]]
 unitary_2 = get_unitary_matrix(3, gate_info_list_2)
 
-rho_1 = tn.Node(np.array([1, 0], dtype=complex))
-rho_2 = tn.Node(np.array([1, 0], dtype=complex))
+rho_1 = get_computational_basis_by_index(1, 0)  # |0>
+rho_2 = get_computational_basis_by_index(1, 0)  # |0>
 stored_density_1 = tn.Node(get_density_matrix(rho_1))
 stored_density_2 = tn.Node(get_density_matrix(rho_2))
 

@@ -2,9 +2,9 @@
 # -*- coding: UTF-8 -*-
 """
 @Project ：SeqQCSim 
-@File    ：qft-small-2.py
+@File    ：qctrl-2.py
 @Author  ：ZiHao Li
-@Date    ：2023/3/17 23:32 
+@Date    ：2023/3/18 20:04 
 """
 
 import tensornetwork as tn
@@ -13,15 +13,18 @@ from operation import *
 from gate import *
 from algorithm import eq_check
 
-B = [get_computational_basis_by_index(2, 0),  # |00>
-     get_computational_basis_by_index(2, 1)  # |01>
+B = [get_computational_basis_by_index(3, 0),  # |000>
+     get_computational_basis_by_index(3, 1),  # |001>
+     get_computational_basis_by_index(3, 2),  # |010>
+     get_computational_basis_by_index(3, 3)  # |011>
      ]  # the collection of all possible input states
 O = list(range(1 << len(B[0].get_all_edges())))  # the collection of all possible outputs
-gate_info_list = [[Cgate([0], QFT(4)), [1, 2, 3, 4, 5]], [CT, [1, 2]], [CNOT, [4, 0]]]
+gate_info_list = [[Cgate([1, 1], Toffoli), [1, 2, 3, 4, 5]], [Cgate([0, 0], H), [1, 2, 3]],
+                  [Cgate([0, 1], H), [1, 2, 4]], [Cgate([1, 0], H), [1, 2, 5]], [CNOT, [3, 0]]]
 unitary = get_unitary_matrix(6, gate_info_list)
 
-rho_1 = get_computational_basis_by_index(4, 0)
-rho_2 = get_computational_basis_by_index(4, 4)
+rho_1 = tn.Node(get_computational_basis_by_index(3, 6))
+rho_2 = tn.Node(get_computational_basis_by_index(3, 5))
 stored_density_1 = tn.Node(get_density_matrix(rho_1))
 stored_density_2 = tn.Node(get_density_matrix(rho_2))
 

@@ -13,7 +13,7 @@ from operation import *
 from gate import *
 from algorithm import eq_check
 
-B = [tn.Node(np.array([1, 0], dtype=complex))]  # the collection of all possible input states
+B = [get_computational_basis_by_index(1, 0)]  # the collection of all possible input states
 O = list(range(1 << len(B[0].get_all_edges())))  # the collection of all possible outputs
 gate_info_list = [[H, [0]], [T, [0]], [H, [0]], [CZ, [0, 1]], [TD, [0]], [H, [0]], [T, [0]], [CZ, [0, 1]], [H, [0]],
                   [Z, [1]], [T, [0]], [H, [0]]]

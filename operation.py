@@ -208,3 +208,10 @@ def matrix_transpose(tensor):
     shape = tensor.shape
     n = 1 << (len(shape) // 2)
     return np.transpose(tensor.reshape(n, n)).reshape(shape)
+
+
+def get_computational_basis_by_index(num_qubits, index):
+    tmp = np.zeros(1 << num_qubits, dtype=complex)
+    tmp[index] = 1
+    basis = tn.Node(tmp.reshape([2] * num_qubits))
+    return basis
