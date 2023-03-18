@@ -34,11 +34,17 @@ def eq_check(B, O, unitary_1, unitary_2, stored_density_1, stored_density_2):
                 super_operator = None
         if super_operator:
             if not is_span(super_operator, super_op_basis):
+                if not is_zero_trace(super_operator):
+                    print("No!")
+                    print("input_state_list:", [x.tensor for x in input_state_list])
+                    print("output_list:", output_list)
+                    return
                 super_op_basis.append(super_operator)
                 for input_state in B:
                     for output in O:
                         Q.push((input_state_list + [input_state], output_list + [output]))
-    if check_trace_all_zero(super_op_basis):
-        print("Yes!")
-    else:
-        print("No!")
+    print("Yes!")
+    # if check_trace_all_zero(super_op_basis):
+    #     print("Yes!")
+    # else:
+    #     print("No!")

@@ -194,12 +194,19 @@ def get_total_super_operator(output_list, input_state_list, stored_density, unit
     return super_operator
 
 
+def is_zero_trace(super_op):
+    tmp = super_op.copy()
+    num_qubits = len(tmp.get_all_edges()) // 2
+    var = [tmp[i] ^ tmp[i + num_qubits] for i in range(num_qubits)]
+    trace = tmp @ tmp
+    if np.abs(trace.tensor) > 1e-13:  # set error threshold
+        return False
+    return True
+
+
 def check_trace_all_zero(super_op_basis):
     for super_op in super_op_basis:
-        num_qubits = len(super_op.get_all_edges()) // 2
-        var = [super_op[i] ^ super_op[i + num_qubits] for i in range(num_qubits)]
-        trace = super_op @ super_op
-        if np.abs(trace.tensor) > 1e-13:  # set error threshold
+        if not is_zero_trace(super_op):
             return False
     return True
 
