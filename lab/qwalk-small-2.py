@@ -11,7 +11,7 @@ import tensornetwork as tn
 import numpy as np
 from operation import *
 from gate import *
-from algorithm import eq_check
+from algorithm import *
 
 B = [get_computational_basis_by_index(1, 0),  # |0>
      get_computational_basis_by_index(1, 1),  # |1>
@@ -31,4 +31,4 @@ theta_Dmatrix = get_density_matrix(theta).reshape(2, 2)
 stored_density_1 = tn.Node(np.kron(theta_Dmatrix, p_1_Dmatrix).reshape([2] * 6))
 stored_density_2 = tn.Node(np.kron(theta_Dmatrix, p_2_Dmatrix).reshape([2] * 6))
 
-eq_check(B, O, unitary, unitary, stored_density_1, stored_density_2)
+eq_check_ver1(B, O, unitary, unitary, stored_density_1, stored_density_2)

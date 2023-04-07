@@ -58,6 +58,18 @@ def RX(theta):
                      [-1j * np.sin(theta / 2), np.cos(theta / 2)]], dtype=complex)
 
 
+def RandWALK(n):
+    """Returns the random walk operator for n qubits."""
+    N = 1 << n
+    mat = np.zeros((N, N), dtype=complex)
+    for i in range(N):
+        if i < N // 2:
+            mat[(i + 1) % (N // 2)][i] = 1
+        else:
+            mat[N // 2 + (i - 1) % (N // 2)][i] = 1
+    return mat.reshape([2] * (2 * n))
+
+
 def QFT(n):
     """Returns the QFT operator for n qubits."""
     N = 1 << n

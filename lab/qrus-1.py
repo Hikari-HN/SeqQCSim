@@ -10,7 +10,7 @@ import tensornetwork as tn
 import numpy as np
 from operation import *
 from gate import *
-from algorithm import eq_check
+from algorithm import *
 
 B = [get_computational_basis_by_index(1, 0)]  # the collection of all possible input states
 O = list(range(1 << len(B[0].get_all_edges())))  # the collection of all possible outputs
@@ -23,4 +23,4 @@ rho_2 = tn.Node(np.array([1, 1], dtype=complex) / np.sqrt(2))
 stored_density_1 = tn.Node(get_density_matrix(rho_1))
 stored_density_2 = tn.Node(get_density_matrix(rho_2))
 
-eq_check(B, O, unitary, unitary, stored_density_1, stored_density_2)
+eq_check_ver1(B, O, unitary, unitary, stored_density_1, stored_density_2)

@@ -11,10 +11,10 @@ import tensornetwork as tn
 import numpy as np
 from operation import *
 from myqueue import *
-from common import is_span
+from common import is_span_ver0
 
 
-def eq_check(B, O, unitary_1, unitary_2, stored_density_1, stored_density_2):
+def eq_check_ver0(B, O, unitary_1, unitary_2, stored_density_1, stored_density_2):
     super_op_basis = []
     Q = MyQueue()
     Q.push(([], []))
@@ -33,7 +33,7 @@ def eq_check(B, O, unitary_1, unitary_2, stored_density_1, stored_density_2):
             else:
                 super_operator = None
         if super_operator:
-            if not is_span(super_operator, super_op_basis):
+            if not is_span_ver0(super_operator, super_op_basis):
                 if not is_zero_trace(super_operator):
                     print("No!")
                     print("input_state_list:", [x.tensor for x in input_state_list])
@@ -48,3 +48,41 @@ def eq_check(B, O, unitary_1, unitary_2, stored_density_1, stored_density_2):
     #     print("Yes!")
     # else:
     #     print("No!")
+
+
+def eq_check_ver1(B, O, unitary_1, unitary_2, stored_density_1, stored_density_2):
+    super_op_basis = []
+    Q = MyQueue()
+    Q.push(([], [], stored_density_1, stored_density_2))
+    while not Q.is_empty():
+        input_state_list, output_list, rho1, rho2 = Q.pop().item
+        if rho1:
+            if rho2:
+                super_operator = rho1 - rho2
+            else:
+                super_operator = rho1
+        else:
+            if rho2:
+                super_operator = tn.Node(-rho2.tensor)
+            else:
+                super_operator = None
+        if super_operator:
+            if not is_span_ver0(super_operator, super_op_basis):
+                if not is_zero_trace(super_operator):
+                    print("No!")
+                    print("input_state_list:", [x.tensor for x in input_state_list])
+                    print("output_list:", output_list)
+                    return
+                super_op_basis.append(super_operator)
+                for input_state in B:
+                    for output in O:
+                        if rho1:
+                            rho11 = get_total_super_operator([output], [input_state], rho1, unitary_1)
+                        else:
+                            rho11 = None
+                        if rho2:
+                            rho22 = get_total_super_operator([output], [input_state], rho2, unitary_2)
+                        else:
+                            rho22 = None
+                        Q.push((input_state_list + [input_state], output_list + [output], rho11, rho22))
+    print("Yes!")

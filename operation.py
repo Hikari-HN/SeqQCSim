@@ -188,7 +188,7 @@ def get_total_super_operator(output_list, input_state_list, stored_density, unit
     for output, input_state in zip(output_list, input_state_list):
         input_density = tn.Node(get_density_matrix(input_state))
         super_operator, prob = get_super_operator_and_prob(output, input_density, stored_density, unitary)
-        if np.abs(prob.tensor) <= 1e-13:  # set error threshold
+        if np.abs(prob.tensor) <= 1e-8:  # set error threshold
             return None
         stored_density = super_operator / prob
     return super_operator
@@ -199,7 +199,7 @@ def is_zero_trace(super_op):
     num_qubits = len(tmp.get_all_edges()) // 2
     var = [tmp[i] ^ tmp[i + num_qubits] for i in range(num_qubits)]
     trace = tmp @ tmp
-    if np.abs(trace.tensor) > 1e-13:  # set error threshold
+    if np.abs(trace.tensor) > 1e-8:  # set error threshold
         return False
     return True
 
