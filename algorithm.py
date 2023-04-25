@@ -11,6 +11,7 @@ import tensornetwork as tn
 import numpy as np
 from operation import *
 from myqueue import *
+from basis import *
 from common import is_span_ver0
 
 
@@ -74,6 +75,47 @@ def eq_check_ver1(B, O, unitary_1, unitary_2, stored_density_1, stored_density_2
                     print("output_list:", output_list)
                     return
                 super_op_basis.append(super_operator)
+                print(len(super_op_basis))
+                for input_state in B:
+                    for output in O:
+                        if rho1:
+                            rho11 = get_total_super_operator([output], [input_state], rho1, unitary_1)
+                        else:
+                            rho11 = None
+                        if rho2:
+                            rho22 = get_total_super_operator([output], [input_state], rho2, unitary_2)
+                        else:
+                            rho22 = None
+                        Q.push((input_state_list + [input_state], output_list + [output], rho11, rho22))
+    # print([x.tensor for x in super_op_basis])
+    print("Yes!")
+
+
+def eq_check_ver2(B, O, unitary_1, unitary_2, stored_density_1, stored_density_2):
+    super_op_basis = SuperOpBasis()
+    Q = MyQueue()
+    Q.push(([], [], stored_density_1, stored_density_2))
+    while not Q.is_empty():
+        input_state_list, output_list, rho1, rho2 = Q.pop().item
+        if rho1:
+            if rho2:
+                super_operator = rho1 - rho2
+            else:
+                super_operator = rho1
+        else:
+            if rho2:
+                super_operator = tn.Node(-rho2.tensor)
+            else:
+                super_operator = None
+        if super_operator:
+            if super_op_basis.is_independent(super_operator):
+                if not is_zero_trace(super_operator):
+                    print("No!")
+                    print("input_state_list:", [x.tensor for x in input_state_list])
+                    print("output_list:", output_list)
+                    return
+                super_op_basis.append(super_operator)
+                print(super_op_basis.size())
                 for input_state in B:
                     for output in O:
                         if rho1:

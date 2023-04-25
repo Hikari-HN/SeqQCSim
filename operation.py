@@ -70,7 +70,7 @@ def do_random_measure(state, operating_qubits):
 def get_new_qubit(state, target_qubit):
     n = len(state.get_all_edges())
     state.tensor = state.tensor.reshape(1 << n)
-    new_qubit = np.zeros(2, dtype=complex)
+    new_qubit = np.zeros(2, dtype=np.complex128)
     for i in range(2):
         for j in range(1 << n):
             if (j >> (n - 1 - target_qubit)) % 2 == i:
@@ -80,7 +80,7 @@ def get_new_qubit(state, target_qubit):
 
 
 def init_unitary_matrix(num_qubits):
-    return np.eye(1 << num_qubits, dtype=complex).reshape([2] * 2 * num_qubits)
+    return np.eye(1 << num_qubits, dtype=np.complex128).reshape([2] * 2 * num_qubits)
 
 
 def get_unitary_matrix(num_qubits, gate_info_list):
@@ -106,7 +106,7 @@ def get_measurement_operator(num_qubits, output):
         output = sum([1 << (num_qubits - 1 - i) for i in range(len(output)) if output[i]])
     if output >= 1 << num_qubits:
         raise ValueError("output must be less than 2 ** num_qubits")
-    basis = np.zeros(1 << num_qubits, dtype=complex)
+    basis = np.zeros(1 << num_qubits, dtype=np.complex128)
     basis[output] = 1
     return np.outer(basis, np.conj(basis)).reshape([2] * 2 * num_qubits)
 
@@ -218,7 +218,7 @@ def matrix_transpose(tensor):
 
 
 def get_computational_basis_by_index(num_qubits, index):
-    tmp = np.zeros(1 << num_qubits, dtype=complex)
+    tmp = np.zeros(1 << num_qubits, dtype=np.complex128)
     tmp[index] = 1
     basis = tn.Node(tmp.reshape([2] * num_qubits))
     return basis

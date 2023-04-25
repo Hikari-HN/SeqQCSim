@@ -19,8 +19,8 @@ gate_info_list = [[H, [0]], [T, [0]], [H, [0]], [CZ, [0, 1]], [TD, [0]], [H, [0]
 unitary = get_unitary_matrix(2, gate_info_list)
 
 rho_1 = get_computational_basis_by_index(1, 0)
-rho_2 = tn.Node(np.array([1, 1], dtype=complex) / np.sqrt(2))
+rho_2 = tn.Node(np.array([1, 1], dtype=np.complex128) / np.sqrt(2))
 stored_density_1 = tn.Node(get_density_matrix(rho_1))
 stored_density_2 = tn.Node(get_density_matrix(rho_2))
 
-eq_check_ver1(B, O, unitary, unitary, stored_density_1, stored_density_2)
+eq_check_ver2(B, O, unitary, unitary, stored_density_1, stored_density_2)

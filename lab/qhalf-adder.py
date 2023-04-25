@@ -30,4 +30,4 @@ rho_2 = get_computational_basis_by_index(1, 0)  # |0>
 stored_density_1 = tn.Node(get_density_matrix(rho_1))
 stored_density_2 = tn.Node(get_density_matrix(rho_2))
 
-eq_check_ver1(B, O, unitary_1, unitary_2, stored_density_1, stored_density_2)
+eq_check_ver2(B, O, unitary_1, unitary_2, stored_density_1, stored_density_2)
