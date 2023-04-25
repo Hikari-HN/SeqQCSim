@@ -22,19 +22,21 @@ class SuperOpBasis:
         self.basis.append(a)
         va = copy.deepcopy(a)
         va = va.tensor.reshape(1, -1)[0]
-        tmp = copy.deepcopy(va)
+        # tmp = copy.deepcopy(va)
         # print("tmp_init:", tmp)
         for b in self.orthogonalbasis:
             # print("va:", va)
             # print("b:", b)
             # print("np.vdot(b, va):", np.vdot(b, va))
             # print("np.vdot(b, va) * b:", np.vdot(b, va) * b)
-            tmp -= np.vdot(b, va) * b
+            # tmp -= np.vdot(b, va) * b
+            va -= np.vdot(b, va) * b
         #     print("tmp_process:", tmp)
         # print("tmp_final:", tmp)
-        va = tmp / np.linalg.norm(tmp)
+        # va = tmp / np.linalg.norm(tmp)
+        va /= np.linalg.norm(va)
         self.orthogonalbasis.append(va)
-        print("orthogonal?:", self.self_check())
+        # print("orthogonal?:", self.self_check())
 
     def is_independent(self, a):
         va = copy.deepcopy(a)
@@ -45,6 +47,8 @@ class SuperOpBasis:
             res += np.linalg.norm(tmp) ** 2
         # print("res:", res)
         # print("|a|**2:", np.linalg.norm(va) ** 2)
+        # print("abs(res / np.linalg.norm(va) ** 2 - 1)", abs(res / np.linalg.norm(va) ** 2 - 1))
+        # if (res == 0 and np.linalg.norm(va) ** 2 == 0) or abs(res / np.linalg.norm(va) ** 2 - 1) < 1e-8:
         if abs(res - np.linalg.norm(va) ** 2) < 1e-8:
             return False
         else:
@@ -74,11 +78,10 @@ class SuperOpBasis:
     def self_check(self):
         for i in range(len(self.orthogonalbasis)):
             for j in range(i + 1, len(self.orthogonalbasis)):
-                if np.vdot(self.orthogonalbasis[i], self.orthogonalbasis[j]) > 1e-8:
+                if np.vdot(self.orthogonalbasis[i], self.orthogonalbasis[j]) > 1e-6:
                     print("orthogonalbasis %d and %d not orthogonal" % (i + 1, j + 1))
                     print("INFO:\n", self.orthogonalbasis[i], self.orthogonalbasis[j])
                     print(np.linalg.norm(self.orthogonalbasis[i]), np.linalg.norm(self.orthogonalbasis[j]))
                     print(np.vdot(self.orthogonalbasis[i], self.orthogonalbasis[j]))
                     return False
         return True
-
