@@ -12,7 +12,7 @@ import numpy as np
 from operation import *
 from myqueue import *
 from basis import *
-from common import is_span_ver0
+from common import is_span_rank_ver
 
 
 def eq_check_ver0(B, O, unitary_1, unitary_2, stored_density_1, stored_density_2):
@@ -34,7 +34,7 @@ def eq_check_ver0(B, O, unitary_1, unitary_2, stored_density_1, stored_density_2
             else:
                 super_operator = None
         if super_operator:
-            if not is_span_ver0(super_operator, super_op_basis):
+            if not is_span_rank_ver(super_operator, super_op_basis):
                 if not is_zero_trace(super_operator):
                     print("No!")
                     print("input_state_list:", [x.tensor for x in input_state_list])
@@ -68,7 +68,7 @@ def eq_check_ver1(B, O, unitary_1, unitary_2, stored_density_1, stored_density_2
             else:
                 super_operator = None
         if super_operator:
-            if not is_span_ver0(super_operator, super_op_basis):
+            if not is_span_rank_ver(super_operator, super_op_basis):
                 if not is_zero_trace(super_operator):
                     print("No!")
                     print("input_state_list:", [x.tensor for x in input_state_list])

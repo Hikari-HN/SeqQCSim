@@ -13,7 +13,7 @@ from operation import *
 from gate import *
 from algorithm import *
 
-n = 6
+n = 4
 B = [get_computational_basis_by_index(1, 0),  # |0>
      get_computational_basis_by_index(1, 1),  # |1>
      tn.Node(np.array([1, 1], dtype=np.complex128) / np.sqrt(2)),  # |+>
