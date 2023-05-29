@@ -9,7 +9,7 @@
 
 
 # 链式队列
-class Node:
+class MyNode:
     def __init__(self, item):
         self.item = item
         self.next = None
@@ -21,7 +21,7 @@ class MyQueue:
         self.tail = None
 
     def push(self, item):
-        node = Node(item)
+        node = MyNode(item)
         if self.head is None:
             self.head = node
             self.tail = node

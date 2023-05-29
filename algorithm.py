@@ -41,6 +41,7 @@ def eq_check_ver0(B, O, unitary_1, unitary_2, stored_density_1, stored_density_2
                     print("output_list:", output_list)
                     return
                 super_op_basis.append(super_operator)
+                # print(len(super_op_basis))
                 for input_state in B:
                     for output in O:
                         Q.push((input_state_list + [input_state], output_list + [output]))
@@ -75,7 +76,7 @@ def eq_check_ver1(B, O, unitary_1, unitary_2, stored_density_1, stored_density_2
                     print("output_list:", output_list)
                     return
                 super_op_basis.append(super_operator)
-                print(len(super_op_basis))
+                # print(len(super_op_basis))
                 for input_state in B:
                     for output in O:
                         if rho1:
@@ -108,6 +109,19 @@ def eq_check_ver2(B, O, unitary_1, unitary_2, stored_density_1, stored_density_2
             else:
                 super_operator = None
         if super_operator:
+            if  len(input_state_list) == 0 and np.all(super_operator.tensor == 0):
+                for input_state in B:
+                    for output in O:
+                        if rho1:
+                            rho11 = get_total_super_operator([output], [input_state], rho1, unitary_1)
+                        else:
+                            rho11 = None
+                        if rho2:
+                            rho22 = get_total_super_operator([output], [input_state], rho2, unitary_2)
+                        else:
+                            rho22 = None
+                        Q.push((input_state_list + [input_state], output_list + [output], rho11, rho22))
+                continue
             if super_op_basis.is_independent(super_operator):
                 if not is_zero_trace(super_operator):
                     print("No!")

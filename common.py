@@ -38,4 +38,3 @@ def is_span_rank_ver(super_op, super_op_basis):
         return True
     else:
         return False
-

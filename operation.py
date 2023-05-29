@@ -191,6 +191,7 @@ def get_total_super_operator(output_list, input_state_list, stored_density, unit
         if np.abs(prob.tensor) <= 1e-8:  # set error threshold
             return None
         stored_density = super_operator / prob
+        # print("prob: ", prob.tensor)
     return super_operator
 
 

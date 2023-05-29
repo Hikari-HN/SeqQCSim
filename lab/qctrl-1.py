@@ -12,6 +12,7 @@ import numpy as np
 from operation import *
 from gate import *
 from algorithm import *
+import time
 
 B = [get_computational_basis_by_index(3, 0),  # |000>
      get_computational_basis_by_index(3, 1),  # |001>
@@ -23,10 +24,11 @@ gate_info_list = [[Cgate([1, 1], Toffoli), [1, 2, 3, 4, 5]], [Cgate([0, 0], H), 
                   [Cgate([0, 1], H), [1, 2, 4]], [Cgate([1, 0], H), [1, 2, 5]], [CNOT, [3, 0]]]
 unitary = get_unitary_matrix(6, gate_info_list)
 
-
 rho_1 = tn.Node(get_computational_basis_by_index(3, 0))
 rho_2 = tn.Node(get_computational_basis_by_index(3, 1))
 stored_density_1 = tn.Node(get_density_matrix(rho_1))
 stored_density_2 = tn.Node(get_density_matrix(rho_2))
-
+start = time.time()
 eq_check_ver2(B, O, unitary, unitary, stored_density_1, stored_density_2)
+end = time.time()
+print("time:", end - start)

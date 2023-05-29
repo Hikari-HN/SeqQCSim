@@ -11,6 +11,7 @@ import numpy as np
 from operation import *
 from gate import *
 from algorithm import *
+import time
 
 B = [get_computational_basis_by_index(1, 0)]  # the collection of all possible input states
 O = list(range(1 << len(B[0].get_all_edges())))  # the collection of all possible outputs
@@ -22,5 +23,7 @@ rho_1 = get_computational_basis_by_index(1, 0)
 rho_2 = tn.Node(np.array([1, 1], dtype=np.complex128) / np.sqrt(2))
 stored_density_1 = tn.Node(get_density_matrix(rho_1))
 stored_density_2 = tn.Node(get_density_matrix(rho_2))
-
+start = time.time()
 eq_check_ver2(B, O, unitary, unitary, stored_density_1, stored_density_2)
+end = time.time()
+print("time:", end - start)

@@ -81,9 +81,9 @@ class SeqQCircuit:
         self.input_pure_state_queue = MyQueue()
         self.input_density_queue = MyQueue()
         self.expected_output_queue = MyQueue()
-        self.num_input_qubits = None
-        self.num_stored_qubits = None
-        self.num_qubits = None
+        self.num_input_qubits = 0
+        self.num_stored_qubits = 0
+        self.num_qubits = 0
         self.init_stored_pure_state = None
         self.init_stored_density = None
         self.stored_density = None
@@ -121,7 +121,7 @@ class SeqQCircuit:
         self.comb_qc.set_gate_info_list(gate_info_list)
 
     def initialize(self):
-        if self.num_stored_qubits is None:
+        if self.num_stored_qubits == 0:
             raise Exception("No init stored density!")
         self.stored_density = self.init_stored_density
         self.num_qubits = self.num_input_qubits + self.num_stored_qubits
@@ -148,17 +148,20 @@ class SeqQCircuit:
                                                        1 << self.num_stored_qubits)).reshape([2] * 2 * self.num_qubits))
         self.comb_qc.set_init_density(total_density)
         transformed_density = self.comb_qc.get_final_result()
+        # print(transformed_density.tensor)
         measurement = tn.Node(
             get_measurement_matrix_by_output(self.num_qubits, list(range(self.num_input_qubits)), expected_output))
         measurement_dagger = tn.Node(np.conj(matrix_transpose(measurement.tensor)))
         [measurement[i + self.num_qubits] ^ transformed_density[i] for i in range(self.num_qubits)]
         [transformed_density[i + self.num_qubits] ^ measurement_dagger[i] for i in range(self.num_qubits)]
         measured_density = measurement @ transformed_density @ measurement_dagger
+        # print(measured_density.tensor)
         prob = measured_density.copy()
         [prob[i] ^ prob[i + self.num_qubits] for i in range(self.num_qubits)]
         prob = prob @ prob
         [measured_density[i] ^ measured_density[i + self.num_qubits] for i in range(self.num_input_qubits)]
         partial_trace = measured_density @ measured_density
+        # print(partial_trace.tensor)
         if np.abs(prob.tensor) <= 1e-8:  # set error threshold
             self.stored_density = None
         else:
@@ -170,15 +173,18 @@ class SeqQCircuit:
             if self.stored_density is None:
                 break
 
-
 # qc = SeqQCircuit()
 # stored_pure_state = tn.Node(np.array([1, 1], dtype=np.complex128) / np.sqrt(2))
 # qc.set_init_stored_pure_state(stored_pure_state)
-# input_pure_state_list = [tn.Node(get_computational_basis_by_index(1, 0)) for _ in range(10)]
+# input_pure_state_list = [tn.Node(get_computational_basis_by_index(1, 0)) for _ in range(2)]
 # qc.set_input_pure_state_queue(input_pure_state_list)
-# qc.set_expected_output_queue([0] * 10)
+# qc.set_expected_output_queue([1,0])
 # gate_info_list = [[H, [0]], [T, [0]], [H, [0]], [CZ, [0, 1]], [TD, [0]], [H, [0]], [T, [0]], [CZ, [0, 1]], [H, [0]],
 #                   [Z, [1]], [T, [0]], [H, [0]]]
 # qc.set_gate_info_list(gate_info_list)
-# qc.run_til_stop()
+# qc.initialize()
+# qc.print_stored_density()
+# qc.run_one_step()
+# qc.print_stored_density()
+# qc.run_one_step()
 # qc.print_stored_density()

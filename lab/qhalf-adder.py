@@ -12,6 +12,7 @@ import numpy as np
 from operation import *
 from gate import *
 from algorithm import *
+import time
 
 B = [get_computational_basis_by_index(2, 0),  # |00>
      get_computational_basis_by_index(2, 1),  # |01>
@@ -29,5 +30,7 @@ rho_1 = get_computational_basis_by_index(1, 0)  # |0>
 rho_2 = get_computational_basis_by_index(1, 0)  # |0>
 stored_density_1 = tn.Node(get_density_matrix(rho_1))
 stored_density_2 = tn.Node(get_density_matrix(rho_2))
-
+start = time.time()
 eq_check_ver2(B, O, unitary_1, unitary_2, stored_density_1, stored_density_2)
+end = time.time()
+print("time:", end - start)
