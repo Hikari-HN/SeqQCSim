@@ -16,6 +16,8 @@ Y = np.array([[0, -1j], [1j, 0]], dtype=np.complex128)
 Z = np.array([[1, 0], [0, -1]], dtype=np.complex128)
 I = np.array([[1, 0], [0, 1]], dtype=np.complex128)
 TD = np.conjugate(T).T
+S = np.array([[1, 0], [0, 1j]], dtype=np.complex128)
+SD = np.conjugate(S).T
 V = np.array([[1 + 1j, 1 - 1j], [1 - 1j, 1 + 1j]], dtype=np.complex128) / 2
 VD = np.conjugate(V).T
 CNOT = np.zeros((2, 2, 2, 2), dtype=np.complex128)
@@ -100,6 +102,6 @@ def Cgate(flag_list, gate):
     gate = gate.reshape(1 << num_target_qubits, 1 << num_target_qubits)
     for j in range(N):
         if (j >> num_target_qubits) == flag_num:
-            for k in range(N - (1 << num_target_qubits), N):
+            for k in range(flag_num << num_target_qubits, (flag_num + 1) << num_target_qubits):
                 mat[j][k] = gate[j % (1 << num_target_qubits)][k % (1 << num_target_qubits)]
     return mat.reshape([2] * (2 * num_qubits))

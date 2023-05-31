@@ -162,6 +162,7 @@ class SeqQCircuit:
         [measured_density[i] ^ measured_density[i + self.num_qubits] for i in range(self.num_input_qubits)]
         partial_trace = measured_density @ measured_density
         # print(partial_trace.tensor)
+        print("prob:", prob.tensor)
         if np.abs(prob.tensor) <= 1e-8:  # set error threshold
             self.stored_density = None
         else:

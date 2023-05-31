@@ -126,7 +126,7 @@ class QuantumMealy:
 # qmwaly_2 = QuantumMealy(2, 2, unitary)
 # init_density_2 = tn.Node(get_density_matrix(tn.Node(np.array([1, 1], dtype=np.complex128) / np.sqrt(2))))
 # qmwaly_2.set_init_density(init_density_2)
-# print(qmealy_1.eq_check_with_mealy(qmwaly_2, basis))
+# print(qmealy_1.eq_check_with_mealy(qmwaly_2, basis)[0])
 
 # basis = [get_computational_basis_by_index(1, 0),  # |0>
 #          get_computational_basis_by_index(1, 1),  # |1>
@@ -148,39 +148,40 @@ class QuantumMealy:
 #     print("input_state_list:", [x.tensor for x in input_state_list])
 #     print("output_list:", output_list)
 
-# basis = [get_computational_basis_by_index(1, 0)]
-# gate_info_list = [[H, [0]], [CNOT, [0, 1]]]
-# unitary = tn.Node(get_unitary_matrix(2, gate_info_list))
-# qmealy_1 = QuantumMealy(2, 2, unitary)
-# init_density_1 = tn.Node(get_density_matrix(get_computational_basis_by_index(1, 0)))
-# qmealy_1.set_init_density(init_density_1)
-# qmwaly_2 = QuantumMealy(2, 2, unitary)
-# init_density_2 = tn.Node(get_density_matrix(get_computational_basis_by_index(1, 1)))
-# qmwaly_2.set_init_density(init_density_2)
-# print(qmealy_1.eq_check_with_mealy(qmwaly_2, basis))
+basis = [get_computational_basis_by_index(1, 0)]
+gate_info_list = [[H, [0]], [CNOT, [0, 1]]]
+unitary = tn.Node(get_unitary_matrix(2, gate_info_list))
+# print(unitary.tensor)
+qmealy_1 = QuantumMealy(2, 2, unitary)
+init_density_1 = tn.Node(get_density_matrix(get_computational_basis_by_index(1, 0)))
+qmealy_1.set_init_density(init_density_1)
+qmwaly_2 = QuantumMealy(2, 2, unitary)
+init_density_2 = tn.Node(get_density_matrix(get_computational_basis_by_index(1, 1)))
+qmwaly_2.set_init_density(init_density_2)
+print(qmealy_1.eq_check_with_mealy(qmwaly_2, basis))
 
 # input_state_list: [array([0.70710678+0.j, 0.70710678+0.j]), array([1.+0.j, 0.+0.j]), array([1.+0.j, 0.+0.j])]
 # output_list: [0, 0, 0]
-B = [get_computational_basis_by_index(2, 0),  # |00>
-     get_computational_basis_by_index(2, 1)  # |01>
-     ]  # the collection of all possible input states
-O = list(range(1 << len(B[0].get_all_edges())))  # the collection of all possible outputs
-gate_info_list = [[Cgate([0], QFT(4)), [1, 2, 3, 4, 5]], [CT, [1, 2]], [CNOT, [4, 0]]]
-unitary = tn.Node(get_unitary_matrix(6, gate_info_list))
-rho_1 = get_computational_basis_by_index(4, 0)
-rho_2 = get_computational_basis_by_index(4, 8)
-stored_density_1 = tn.Node(get_density_matrix(rho_1))
-stored_density_2 = tn.Node(get_density_matrix(rho_2))
-qmealy_1 = QuantumMealy(4, 16, unitary)
-qmealy_1.set_stored_density(stored_density_1)
-D = [tn.Node(get_density_matrix(x)) for x in B]
-q1 = qmealy_1.get_prob(D[2], O[0]).tensor
-qmealy_1.set_stored_density(qmealy_1.get_stored_density(D[2], O[0]))
-q2 = qmealy_1.get_prob(D[0], O[0]).tensor
-qmealy_1.set_stored_density(qmealy_1.get_stored_density(D[0], O[0]))
-q3 = qmealy_1.get_prob(D[0], O[0]).tensor
-qmealy_1.set_stored_density(qmealy_1.get_stored_density(D[0], O[0]))
-print(q1 * q2 * q3, q1, q2, q3)
-
-qmwaly_2 = QuantumMealy(4, 16, unitary)
-qmwaly_2.set_stored_density(stored_density_2)
+# B = [get_computational_basis_by_index(2, 0),  # |00>
+#      get_computational_basis_by_index(2, 1)  # |01>
+#      ]  # the collection of all possible input states
+# O = list(range(1 << len(B[0].get_all_edges())))  # the collection of all possible outputs
+# gate_info_list = [[Cgate([0], QFT(4)), [1, 2, 3, 4, 5]], [CT, [1, 2]], [CNOT, [4, 0]]]
+# unitary = tn.Node(get_unitary_matrix(6, gate_info_list))
+# rho_1 = get_computational_basis_by_index(4, 0)
+# rho_2 = get_computational_basis_by_index(4, 8)
+# stored_density_1 = tn.Node(get_density_matrix(rho_1))
+# stored_density_2 = tn.Node(get_density_matrix(rho_2))
+# qmealy_1 = QuantumMealy(4, 16, unitary)
+# qmealy_1.set_stored_density(stored_density_1)
+# D = [tn.Node(get_density_matrix(x)) for x in B]
+# q1 = qmealy_1.get_prob(D[2], O[0]).tensor
+# qmealy_1.set_stored_density(qmealy_1.get_stored_density(D[2], O[0]))
+# q2 = qmealy_1.get_prob(D[0], O[0]).tensor
+# qmealy_1.set_stored_density(qmealy_1.get_stored_density(D[0], O[0]))
+# q3 = qmealy_1.get_prob(D[0], O[0]).tensor
+# qmealy_1.set_stored_density(qmealy_1.get_stored_density(D[0], O[0]))
+# print(q1 * q2 * q3, q1, q2, q3)
+#
+# qmwaly_2 = QuantumMealy(4, 16, unitary)
+# qmwaly_2.set_stored_density(stored_density_2)
