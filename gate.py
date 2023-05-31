@@ -10,11 +10,11 @@ import numpy as np
 
 # These are just numpy arrays of the operators.
 H = np.array([[1, 1], [1, -1]], dtype=np.complex128) / np.sqrt(2)
-T = np.array([[1, 0], [0, np.exp(np.pi * 1.0j / 4)]], dtype=np.complex128)
 X = np.array([[0, 1], [1, 0]], dtype=np.complex128)
 Y = np.array([[0, -1j], [1j, 0]], dtype=np.complex128)
 Z = np.array([[1, 0], [0, -1]], dtype=np.complex128)
 I = np.array([[1, 0], [0, 1]], dtype=np.complex128)
+T = np.array([[1, 0], [0, np.exp(np.pi * 1.0j / 4)]], dtype=np.complex128)
 TD = np.conjugate(T).T
 S = np.array([[1, 0], [0, 1j]], dtype=np.complex128)
 SD = np.conjugate(S).T
